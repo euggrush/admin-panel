@@ -1,12 +1,22 @@
-'use client'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import jwt from 'jsonwebtoken'
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const token = (await cookies()).get('token')?.value
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">👋 Добро пожаловать в админку</h1>
-      
-      <p>Здесь будет список заявок или панель управления.</p>
-    </div>
-  )
+  if (!token) redirect('/login')
+
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET!)
+    const username = typeof user === 'object' && 'username' in user ? user.username : undefined
+
+    return (
+      <div className="p-6">
+        <h1 className="text-2xl">Привет, {username}</h1>
+      </div>
+    )
+  } catch {
+    redirect('/login')
+  }
 }

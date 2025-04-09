@@ -42,3 +42,14 @@ pnpm-debug.log*
 
 # system
 Thumbs.db
+
+# database
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+*.db-journal
+# coverage
+coverage/
+# next.js build output
+.next/
