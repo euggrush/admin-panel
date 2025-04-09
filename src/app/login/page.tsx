@@ -8,14 +8,23 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleLogin = () => {
-    if (username === 'admin' && password === '123456') {
-      localStorage.setItem('isLoggedIn', 'true');
-      router.push('/dashboard');
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    })
+
+    if (res.ok) {
+      router.push('/dashboard')
     } else {
-      setError('Неверный логин или пароль');
+      const data = await res.json()
+      setError(data.message || 'Ошибка входа')
     }
-  };
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
