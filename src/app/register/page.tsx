@@ -1,31 +1,43 @@
-'use client';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [username, setUsername] = useState('');
-  const [pass1, setPass1] = useState('');
-  const [pass2, setPass2] = useState('');
-  const [error, setError] = useState('');
+  const router = useRouter()
+  const [username, setUsername] = useState('')
+  const [pass1, setPass1] = useState('')
+  const [pass2, setPass2] = useState('')
+  const [error, setError] = useState('')
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    setError('')
+
     if (!username || !pass1 || !pass2) {
-      setError('Заполните все поля');
-      return;
+      return setError('Все поля обязательны')
     }
 
     if (pass1 !== pass2) {
-      setError('Пароли не совпадают');
-      return;
+      return setError('Пароли не совпадают')
     }
 
-    // Пример: сохраняем пользователя в localStorage
-    localStorage.setItem('registeredUser', JSON.stringify({ username, password: pass1 }));
-    localStorage.setItem('isLoggedIn', 'true');
+    if (pass1.length < 6) {
+      return setError('Пароль должен содержать минимум 6 символов')
+    }
 
-    router.push('/dashboard');
-  };
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password: pass1 }),
+    })
+
+    if (res.ok) {
+      router.push('/dashboard')
+    } else {
+      const data = await res.json()
+      setError(data.message || 'Ошибка регистрации')
+    }
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
@@ -61,5 +73,5 @@ export default function RegisterPage() {
         </button>
       </div>
     </div>
-  );
+  )
 }
